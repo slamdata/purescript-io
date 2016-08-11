@@ -13,8 +13,8 @@ overlapping effects.
 
 While the effect system is undoubtedly useful, there are cases where it's more
 of a hindrance — where it doesn't make reasoning about code easier, but instead,
-merely adds a ton of boilerplate and semantically meaningless labels get
-threaded through endless stacks of functions.
+merely adds a ton of boilerplate, as semantically meaningless or overlapping
+labels get threaded through endless stacks of functions.
 
 In those cases, `IO` is here to the rescue!
 
@@ -30,13 +30,13 @@ no runtime overhead or performance penalty for `IO`.
 `IO` only has one function, which should only be used in your `main`:
 
 ```haskell
-runIO :: forall a. IO a -> AffIO a
+runIO :: forall a. IO a -> Aff (infinity :: INFINITY) a
 ```
 
 This converts an `IO` into an `Aff`, which you can then "convert" into a
 runnable `Eff` using `launchAff` or `runAff`.
 
-The effect row is closed, which is intentionally because `INFINITY` represents
+The effect row is closed, which is intentional because `INFINITY` represents
 all possible effects. This will help ensure you only call `runIO` at the top
 level of your program.
 
