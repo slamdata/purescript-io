@@ -40,8 +40,8 @@ This serves a similar purpose to effect rows in PureScript, whereby every "label
 
 Similarly, if we were using `Free` directly, instead of using type classes to abstract over a `Free` encoding, we would denote effects using functors:
 
-```
-class ConfigF a
+```haskell
+data ConfigF a
   = ReadConfig (Config -> a)
   
 serverAddress :: PrismT' f ConfigF -> Free f InetAddress
