@@ -44,7 +44,7 @@ Similarly, if we were using `Free` directly, instead of using type classes to ab
 data ConfigF a
   = ReadConfig (Config -> a)
   
-serverAddress :: PrismT' f ConfigF -> Free f InetAddress
+serverAddress :: ReaderT (PrismT' f ConfigF) (Free f) InetAddress
 ```
 
 In this case, we have all the benefits of finely-grained effects, including semantic descriptions of those effects, but without needing to use labels in effect rows.
