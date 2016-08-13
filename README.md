@@ -25,6 +25,34 @@ catchable exception.
 Under the covers, `IO` is based on `Aff`, and there is no wrapper so there is
 no runtime overhead or performance penalty for `IO`.
 
+# Effects vs MTL
+
+In MTL, we would denote effects using type classes:
+
+```haskell
+class (Monad m) <= MonadConfig m where
+  readConfig :: m Config
+
+serverAddress :: forall m. (MonadConfig m) => m InetAddress
+```
+
+This serves a similar purpose to effect rows in PureScript, whereby every "label" corresponds to a set of functionality described by a type class. The advantage to using classes over labels is that the semantics can be well-described by the classes.
+
+Similarly, if we were using `Free` directly, instead of using type classes to abstract over a `Free` encoding, we would denote effects using functors:
+
+```
+class ConfigF a
+  = ReadConfig (Config -> a)
+  
+serverAddress :: PrismT' f ConfigF -> Free f InetAddress
+```
+
+In this case, we have all the benefits of finely-grained effects, including semantic descriptions of those effects, but without needing to use labels in effect rows.
+
+In either MTL or direct-Free encodings, we have all the tools necessary to provide clear information to developers to help them reason about the code they are writing — all without using effect rows.
+
+Therefore, MTL and direct-Free approaches can be considered alternatives to PureScript's own effect system (which is implemented as a library, and not baked into PureScript). When using one of these alternatives, it can simplify code and improve type inference to use `IO` instead of trying to doubly-encode effects using two systems — one of which has no semantic or algebraic basis.
+
 # Usage
 
 `IO` only has one function, which should only be used in your `main`:
