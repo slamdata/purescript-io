@@ -1,87 +1,58 @@
-module Control.Monad.IO (IO, INFINITY, AffIO(..), runIO) where
-  import Prelude
+module Control.Monad.IO
+  ( INFINITY
+  , IO(..)
+  ) where
 
-  import Control.Alt (class Alt, alt)
-  import Control.Alternative (class Alternative)
-  import Control.Monad.Eff (Eff)
-  import Control.Monad.Eff.Class (class MonadEff, liftEff)
-  import Control.Monad.Aff (Aff)
-  import Control.Monad.Aff.Class (class MonadAff)
-  import Control.Monad.Eff.Exception (Error)
-  import Control.Monad.Error.Class (class MonadError, throwError, catchError)
-  import Control.Monad.Rec.Class (class MonadRec, tailRecM)
-  import Control.MonadPlus (class MonadZero, class MonadPlus, empty)
-  import Control.Parallel.Class (class MonadRace, class MonadPar, par, race, stall)
-  import Control.Plus (class Plus)
+import Control.Alt (class Alt)
+import Control.Alternative (class Alternative)
+import Control.Monad.Aff (Aff)
+import Control.Monad.Aff.Class (class MonadAff)
+import Control.Monad.Aff.Unsafe (unsafeCoerceAff)
+import Control.Monad.Eff.Class (class MonadEff, liftEff)
+import Control.Monad.Eff.Exception (Error)
+import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
+import Control.Monad.Error.Class (class MonadError)
+import Control.Monad.IO (INFINITY)
+import Control.Monad.Rec.Class (class MonadRec)
+import Control.MonadPlus (class MonadPlus)
+import Control.MonadZero (class MonadZero)
+import Control.Plus (class Plus)
+import Data.Monoid (class Monoid)
+import Data.Newtype (class Newtype, wrap)
+import Prelude
 
-  import Data.Monoid (class Monoid, mempty)
+foreign import data INFINITY :: Effect
 
-  import Unsafe.Coerce (unsafeCoerce)
+newtype IO a = IO (Aff (infinity :: INFINITY) a)
 
-  foreign import data IO :: * -> *
+derive instance newtypeIO :: Newtype (IO a) _
 
-  foreign import data INFINITY :: !
+derive newtype instance functorIO     :: Functor     IO
+derive newtype instance applyIO       :: Apply       IO
+derive newtype instance applicativeIO :: Applicative IO
+derive newtype instance bindIO        :: Bind        IO
+derive newtype instance monadIO       :: Monad       IO
 
-  type AffIO a = Aff (infinity :: INFINITY) a
+derive newtype instance monadRecIO :: MonadRec IO
 
-  runIO :: forall a. IO a -> AffIO a
-  runIO = unsafeCoerce
+derive newtype instance semigroupIO :: (Semigroup a) => Semigroup (IO a)
 
-  toIO :: forall e a. Aff e a -> IO a
-  toIO = unsafeCoerce
+derive newtype instance monoidIO :: (Monoid a) => Monoid (IO a)
 
-  instance semigroupIO :: (Semigroup a) => Semigroup (IO a) where
-    append a b = toIO (append (runIO a) (runIO b))
+instance monadAffIO :: MonadAff eff IO where
+  liftAff = wrap <<< unsafeCoerceAff
 
-  instance monoidIO :: (Monoid a) => Monoid (IO a) where
-    mempty = toIO (pure mempty)
+instance monadEffIO :: MonadEff eff IO where
+  liftEff = wrap <<< liftEff <<< unsafeCoerceEff
 
-  instance functorIO :: Functor IO where
-    map f fa = toIO (map f (runIO fa))
+derive newtype instance monadErrorIO :: MonadError Error IO
 
-  instance applyIO :: Apply IO where
-    apply ff fa = toIO (apply (runIO ff) (runIO fa))
+derive newtype instance altIO :: Alt IO
 
-  instance applicativeIO :: Applicative IO where
-    pure v = toIO (pure v)
+derive newtype instance plusIO :: Plus IO
 
-  instance bindIO :: Bind IO where
-    bind fa f = toIO (bind (runIO fa) (unsafeCoerce f))
+derive newtype instance alternativeIO :: Alternative IO
 
-  instance monadIO :: Monad IO
+derive newtype instance monadZeroIO :: MonadZero IO
 
-  instance monadEffIO :: MonadEff e IO where
-    liftEff = liftEff'
-      where
-        liftEff' :: forall a. Eff e a -> IO a
-        liftEff' eff = toIO (liftEff eff :: Aff e a)
-
-  instance monadAffIO :: MonadAff e IO where
-    liftAff = toIO
-
-  instance monadErrorIO :: MonadError Error IO where
-    throwError e = toIO (throwError e)
-
-    catchError io f = toIO (catchError (runIO io) (runIO <$> f))
-
-  instance altIO :: Alt IO where
-    alt a1 a2 = toIO (alt (runIO a1) (runIO a2))
-
-  instance plusIO :: Plus IO where
-    empty = toIO empty
-
-  instance alternativeIO :: Alternative IO
-
-  instance monadZero :: MonadZero IO
-
-  instance monadPlusIO :: MonadPlus IO
-
-  instance monadRecIO :: MonadRec IO where
-    tailRecM f a = toIO (tailRecM (unsafeCoerce f) a)
-
-  instance monadParIO :: MonadPar IO where
-    par f ma mb = toIO (par f (runIO ma) (runIO mb))
-
-  instance monadRaceIO :: MonadRace IO where
-    stall = toIO stall
-    race a1 a2 = toIO (race (runIO a1) (runIO a2))
+derive newtype instance monadPlusIO :: MonadPlus IO
