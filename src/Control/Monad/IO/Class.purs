@@ -4,7 +4,7 @@ import Control.Monad.IO (IO)
 import Prelude
 
 class (Monad m) <= MonadIO m where
-  liftIO :: ∀ a. IO a -> m a
+  liftIO :: IO ~> m
 
 instance monadIOIO :: MonadIO IO where
   liftIO = id

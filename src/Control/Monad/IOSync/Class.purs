@@ -7,7 +7,7 @@ import Data.Newtype (unwrap, wrap)
 import Prelude
 
 class (Monad m) <= MonadIOSync m where
-  liftIOSync :: ∀ a. IOSync a -> m a
+  liftIOSync :: IOSync ~> m
 
 instance monadIOSyncIOSync :: MonadIOSync IOSync where
   liftIOSync = id
