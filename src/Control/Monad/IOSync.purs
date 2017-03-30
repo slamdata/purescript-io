@@ -1,5 +1,5 @@
 module Control.Monad.IOSync
-  ( module Control.Monad.IO
+  ( module Control.Monad.IO.Effect
   , IOSync(..)
   ) where
 
@@ -10,7 +10,7 @@ import Control.Monad.Eff.Class (class MonadEff, liftEff)
 import Control.Monad.Eff.Exception (Error, catchException, error, throwException)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 import Control.Monad.Error.Class (class MonadError, catchError, throwError)
-import Control.Monad.IO (INFINITY)
+import Control.Monad.IO.Effect (INFINITY)
 import Control.Monad.Rec.Class (class MonadRec)
 import Control.MonadZero (class MonadZero)
 import Control.Plus (class Plus)

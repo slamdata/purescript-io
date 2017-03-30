@@ -1,28 +1,31 @@
 module Control.Monad.IO
-  ( INFINITY
+  ( module Control.Monad.IO.Effect
   , IO(..)
+  , launchIO
   ) where
 
 import Control.Alt (class Alt)
 import Control.Alternative (class Alternative)
-import Control.Monad.Aff (Aff)
+import Control.Monad.Aff (Aff, launchAff)
 import Control.Monad.Aff.Class (class MonadAff)
 import Control.Monad.Aff.Unsafe (unsafeCoerceAff)
 import Control.Monad.Eff.Class (class MonadEff, liftEff)
 import Control.Monad.Eff.Exception (Error)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 import Control.Monad.Error.Class (class MonadError)
-import Control.Monad.IO (INFINITY)
+import Control.Monad.IO.Effect (INFINITY)
+import Control.Monad.IOSync (IOSync)
 import Control.Monad.Rec.Class (class MonadRec)
 import Control.MonadZero (class MonadZero)
 import Control.Plus (class Plus)
 import Data.Monoid (class Monoid)
-import Data.Newtype (class Newtype, wrap)
+import Data.Newtype (class Newtype, unwrap, wrap)
 import Prelude
 
-foreign import data INFINITY :: Effect
-
 newtype IO a = IO (Aff (infinity :: INFINITY) a)
+
+launchIO :: ∀ a. IO a -> IOSync Unit
+launchIO = void <<< liftEff <<< launchAff <<< unwrap
 
 derive instance newtypeIO :: Newtype (IO a) _
 
