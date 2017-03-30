@@ -14,7 +14,6 @@ import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 import Control.Monad.Error.Class (class MonadError)
 import Control.Monad.IO (INFINITY)
 import Control.Monad.Rec.Class (class MonadRec)
-import Control.MonadPlus (class MonadPlus)
 import Control.MonadZero (class MonadZero)
 import Control.Plus (class Plus)
 import Data.Monoid (class Monoid)
@@ -54,5 +53,3 @@ derive newtype instance plusIO :: Plus IO
 derive newtype instance alternativeIO :: Alternative IO
 
 derive newtype instance monadZeroIO :: MonadZero IO
-
-derive newtype instance monadPlusIO :: MonadPlus IO

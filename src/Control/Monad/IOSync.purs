@@ -12,7 +12,6 @@ import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
 import Control.Monad.Error.Class (class MonadError, catchError, throwError)
 import Control.Monad.IO (INFINITY)
 import Control.Monad.Rec.Class (class MonadRec)
-import Control.MonadPlus (class MonadPlus)
 import Control.MonadZero (class MonadZero)
 import Control.Plus (class Plus)
 import Data.Monoid (class Monoid, mempty)
@@ -54,5 +53,3 @@ instance plusIOSync :: Plus IOSync where
 instance alternativeIOSync :: Alternative IOSync
 
 instance monadZeroIOSync :: MonadZero IOSync
-
-instance monadPlusIOSync :: MonadPlus IOSync
