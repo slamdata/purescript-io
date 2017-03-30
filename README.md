@@ -55,9 +55,11 @@ Therefore, MTL and direct-Free approaches can be considered alternatives to Pure
 
 # Usage
 
-`IO` only has one function, which should only be used in your `main`:
+`IO` is a newtype for `Aff`, which you can unwrap to be used in your `main`:
 
 ```haskell
+import Data.Newtype (unwrap)
+
 unwrap :: forall a. IO a -> Aff (infinity :: INFINITY) a
 ```
 
