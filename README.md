@@ -58,16 +58,14 @@ Therefore, MTL and direct-Free approaches can be considered alternatives to Pure
 `IO` is a newtype for `Aff`, which you can unwrap to be used in your `main`:
 
 ```haskell
-import Data.Newtype (unwrap)
-
-unwrap :: forall a. IO a -> Aff (infinity :: INFINITY) a
+runIO :: forall a. IO a -> Aff (infinity :: INFINITY) a
 ```
 
 This converts an `IO` into an `Aff`, which you can then "convert" into a
 runnable `Eff` using `launchAff` or `runAff`.
 
 The effect row is closed, which is intentional because `INFINITY` represents
-all possible effects. This will help ensure you only call `unwrap` at the top
+all possible effects. This will help ensure you only call `runIO` at the top
 level of your program.
 
 Besides this, `IO` has almost all the same instances as `Aff`, and may be used
