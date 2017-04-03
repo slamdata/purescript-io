@@ -1,6 +1,8 @@
 module Control.Monad.IO
   ( module Control.Monad.IO.Effect
   , IO(..)
+  , runIO
+  , runIO'
   , launchIO
   ) where
 
@@ -23,6 +25,12 @@ import Data.Newtype (class Newtype, unwrap, wrap)
 import Prelude
 
 newtype IO a = IO (Aff (infinity :: INFINITY) a)
+
+runIO :: IO ~> Aff (infinity :: INFINITY)
+runIO = unwrap
+
+runIO' :: ∀ eff. IO ~> Aff (infinity :: INFINITY | eff)
+runIO' = unsafeCoerceAff <<< unwrap
 
 launchIO :: ∀ a. IO a -> IOSync Unit
 launchIO = void <<< liftEff <<< launchAff <<< unwrap

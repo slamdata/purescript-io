@@ -1,6 +1,8 @@
 module Control.Monad.IOSync
   ( module Control.Monad.IO.Effect
   , IOSync(..)
+  , runIOSync
+  , runIOSync'
   ) where
 
 import Control.Alt (class Alt)
@@ -19,6 +21,12 @@ import Data.Newtype (class Newtype, unwrap, wrap)
 import Prelude
 
 newtype IOSync a = IOSync (Eff (infinity :: INFINITY) a)
+
+runIOSync :: IOSync ~> Eff (infinity :: INFINITY)
+runIOSync = unwrap
+
+runIOSync' :: ∀ eff. IOSync ~> Eff (infinity :: INFINITY | eff)
+runIOSync' = unsafeCoerceEff <<< unwrap
 
 derive instance newtypeIOSync :: Newtype (IOSync a) _
 
