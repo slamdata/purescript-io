@@ -14,7 +14,7 @@ import Control.Monad.Aff.Unsafe (unsafeCoerceAff)
 import Control.Monad.Eff.Class (class MonadEff, liftEff)
 import Control.Monad.Eff.Exception (Error)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
-import Control.Monad.Error.Class (class MonadError)
+import Control.Monad.Error.Class (class MonadError, class MonadThrow)
 import Control.Monad.IO.Effect (INFINITY)
 import Control.Monad.IOSync (IOSync)
 import Control.Monad.Rec.Class (class MonadRec)
@@ -54,6 +54,8 @@ instance monadAffIO :: MonadAff eff IO where
 
 instance monadEffIO :: MonadEff eff IO where
   liftEff = wrap <<< liftEff <<< unsafeCoerceEff
+
+derive newtype instance monadThrowIO :: MonadThrow Error IO
 
 derive newtype instance monadErrorIO :: MonadError Error IO
 
