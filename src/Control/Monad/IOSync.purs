@@ -11,7 +11,7 @@ import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Class (class MonadEff, liftEff)
 import Control.Monad.Eff.Exception (Error, catchException, error, throwException)
 import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
-import Control.Monad.Error.Class (class MonadError, catchError, throwError)
+import Control.Monad.Error.Class (class MonadError, class MonadThrow, catchError, throwError)
 import Control.Monad.IO.Effect (INFINITY)
 import Control.Monad.Rec.Class (class MonadRec)
 import Control.MonadZero (class MonadZero)
@@ -50,6 +50,8 @@ instance monadEffIOSync :: MonadEff eff IOSync where
 instance monadErrorIOSync :: MonadError Error IOSync where
   catchError a k = liftEff $
     catchException (\e -> unwrap $ k e) (unsafeCoerceEff $ unwrap a)
+
+instance monadThrowIOSync :: MonadThrow Error IOSync where
   throwError = liftEff <<< throwException
 
 instance altIOSync :: Alt IOSync where
