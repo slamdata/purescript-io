@@ -55,8 +55,8 @@ derive newtype instance monoidIO      :: (Monoid a) => Monoid (IO a)
 derive newtype instance functorParIO     :: Functor     ParIO
 derive newtype instance applyParIO       :: Apply       ParIO
 derive newtype instance applicativeParIO :: Applicative ParIO
-derive newtype instance semigroupParIO   :: (Semigroup a) => Semigroup (IO a)
-derive newtype instance monoidParIO      :: (Monoid a) => Monoid (IO a)
+derive newtype instance semigroupParIO   :: (Semigroup a) => Semigroup (ParIO a)
+derive newtype instance monoidParIO      :: (Monoid a) => Monoid (ParIO a)
 
 instance monadAffIO :: MonadAff eff IO where
   liftAff = wrap <<< unsafeCoerceAff
