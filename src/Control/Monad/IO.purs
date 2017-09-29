@@ -1,15 +1,18 @@
 module Control.Monad.IO
   ( module Control.Monad.IO.Effect
   , IO(..)
+  , ParIO(..)
   , runIO
   , runIO'
   , launchIO
   ) where
 
+import Prelude
+
 import Control.Alt (class Alt)
 import Control.Alternative (class Alternative)
-import Control.Monad.Aff (Aff, launchAff)
-import Control.Monad.Aff.Class (class MonadAff)
+import Control.Monad.Aff (Aff, ParAff(..), launchAff)
+import Control.Monad.Aff.Class (class MonadAff, liftAff)
 import Control.Monad.Aff.Unsafe (unsafeCoerceAff)
 import Control.Monad.Eff.Class (class MonadEff, liftEff)
 import Control.Monad.Eff.Exception (Error)
@@ -19,12 +22,15 @@ import Control.Monad.IO.Effect (INFINITY)
 import Control.Monad.IOSync (IOSync)
 import Control.Monad.Rec.Class (class MonadRec)
 import Control.MonadZero (class MonadZero)
+import Control.Parallel (class Parallel, parallel, sequential)
 import Control.Plus (class Plus)
 import Data.Monoid (class Monoid)
 import Data.Newtype (class Newtype, unwrap, wrap)
 import Prelude
 
 newtype IO a = IO (Aff (infinity :: INFINITY) a)
+
+newtype ParIO a = ParIO (ParAff (infinity :: INFINITY) a)
 
 runIO :: IO ~> Aff (infinity :: INFINITY)
 runIO = unwrap
@@ -42,15 +48,22 @@ derive newtype instance applyIO       :: Apply       IO
 derive newtype instance applicativeIO :: Applicative IO
 derive newtype instance bindIO        :: Bind        IO
 derive newtype instance monadIO       :: Monad       IO
+derive newtype instance monadRecIO    :: MonadRec    IO
+derive newtype instance semigroupIO   :: (Semigroup a) => Semigroup (IO a)
+derive newtype instance monoidIO      :: (Monoid a) => Monoid (IO a)
 
-derive newtype instance monadRecIO :: MonadRec IO
-
-derive newtype instance semigroupIO :: (Semigroup a) => Semigroup (IO a)
-
-derive newtype instance monoidIO :: (Monoid a) => Monoid (IO a)
+derive newtype instance functorParIO     :: Functor     ParIO
+derive newtype instance applyParIO       :: Apply       ParIO
+derive newtype instance applicativeParIO :: Applicative ParIO
+derive newtype instance semigroupParIO   :: (Semigroup a) => Semigroup (IO a)
+derive newtype instance monoidParIO      :: (Monoid a) => Monoid (IO a)
 
 instance monadAffIO :: MonadAff eff IO where
   liftAff = wrap <<< unsafeCoerceAff
+
+instance parallelParIO :: Parallel ParIO IO where
+  parallel = ParIO <<< ParAff <<< runIO
+  sequential (ParIO (ParAff ma)) = IO ma
 
 instance monadEffIO :: MonadEff eff IO where
   liftEff = wrap <<< liftEff <<< unsafeCoerceEff
