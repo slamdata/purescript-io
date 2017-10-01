@@ -11,8 +11,8 @@ import Prelude
 
 import Control.Alt (class Alt)
 import Control.Alternative (class Alternative)
-import Control.Monad.Aff (Aff, ParAff(..), launchAff)
-import Control.Monad.Aff.Class (class MonadAff, liftAff)
+import Control.Monad.Aff (Aff, ParAff, launchAff)
+import Control.Monad.Aff.Class (class MonadAff)
 import Control.Monad.Aff.Unsafe (unsafeCoerceAff)
 import Control.Monad.Eff.Class (class MonadEff, liftEff)
 import Control.Monad.Eff.Exception (Error)
@@ -26,7 +26,6 @@ import Control.Parallel (class Parallel, parallel, sequential)
 import Control.Plus (class Plus)
 import Data.Monoid (class Monoid)
 import Data.Newtype (class Newtype, unwrap, wrap)
-import Prelude
 
 newtype IO a = IO (Aff (infinity :: INFINITY) a)
 
@@ -62,8 +61,8 @@ instance monadAffIO :: MonadAff eff IO where
   liftAff = wrap <<< unsafeCoerceAff
 
 instance parallelParIO :: Parallel ParIO IO where
-  parallel = ParIO <<< ParAff <<< runIO
-  sequential (ParIO (ParAff ma)) = IO ma
+  parallel = ParIO <<< parallel <<< runIO
+  sequential (ParIO ma) = IO $ sequential ma
 
 instance monadEffIO :: MonadEff eff IO where
   liftEff = wrap <<< liftEff <<< unsafeCoerceEff
@@ -76,6 +75,6 @@ derive newtype instance altIO :: Alt IO
 
 derive newtype instance plusIO :: Plus IO
 
-derive newtype instance alternativeIO :: Alternative IO
+instance alternativeIO :: Alternative IO
 
-derive newtype instance monadZeroIO :: MonadZero IO
+instance monadZeroIO :: MonadZero IO
