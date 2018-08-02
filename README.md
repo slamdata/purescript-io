@@ -4,6 +4,8 @@ An IO monad for PureScript.
 
 Don't ask. Don't tell. Joyfully use in secrecy.
 
+**:warning: :rotating_light: In PureScript 0.12, you can use [Effect](https://github.com/purescript/purescript-effect) and [Aff](https://github.com/slamdata/purescript-aff) without effect rows, so you do not need this library.:warning: :rotating_light:**
+
 # Introduction
 
 PureScript's effect system is based on row types, and has no semantic or
