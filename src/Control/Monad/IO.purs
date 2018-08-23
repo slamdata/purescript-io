@@ -57,6 +57,10 @@ derive newtype instance applicativeParIO :: Applicative ParIO
 derive newtype instance semigroupParIO   :: (Semigroup a) => Semigroup (ParIO a)
 derive newtype instance monoidParIO      :: (Monoid a) => Monoid (ParIO a)
 
+derive newtype instance altParIO         :: Alt ParIO
+derive newtype instance plusParIO        :: Plus ParIO
+derive newtype instance alternativeParIO :: Alternative ParIO
+
 instance monadAffIO :: MonadAff eff IO where
   liftAff = wrap <<< unsafeCoerceAff
 
